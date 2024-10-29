@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAutoRenderingApp", "BlazorAutoRenderingApp\BlazorAutoRenderingApp\BlazorAutoRenderingApp.csproj", "{BA894865-A3C7-47BF-9161-54A7460A2E04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAutoRenderingApp.Client", "BlazorAutoRenderingApp\BlazorAutoRenderingApp.Client\BlazorAutoRenderingApp.Client.csproj", "{319D761F-840E-49CA-ADF1-89452929E341}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA894865-A3C7-47BF-9161-54A7460A2E04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA894865-A3C7-47BF-9161-54A7460A2E04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA894865-A3C7-47BF-9161-54A7460A2E04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA894865-A3C7-47BF-9161-54A7460A2E04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{319D761F-840E-49CA-ADF1-89452929E341}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{319D761F-840E-49CA-ADF1-89452929E341}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{319D761F-840E-49CA-ADF1-89452929E341}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{319D761F-840E-49CA-ADF1-89452929E341}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {474A24F6-3B8D-4A59-971D-D661DB25D0AC}
+	EndGlobalSection
+EndGlobal
