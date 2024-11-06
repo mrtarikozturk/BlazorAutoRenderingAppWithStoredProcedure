@@ -1,11 +1,11 @@
 ﻿@page "/students/create"
-@using Microsoft.EntityFrameworkCore
 @using BlazorAutoRenderingApp.Models
-@inject IDbContextFactory<BlazorAutoRenderingApp.Data.BlazorAutoRenderingAppContext> DbFactory
+@inject Student_DAL StudentService
+@using BlazorAutoRenderingApp.DAL
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Create Student</PageTitle>
 
 <h1>Create</h1>
 
@@ -13,26 +13,34 @@
 <hr />
 <div class="row">
 	<div class="col-md-4">
-		<EditForm method="post" Model="Student" OnValidSubmit="AddStudent" FormName="create" Enhance>
-			<DataAnnotationsValidator />
-			<ValidationSummary class="text-danger" />
+		<form method="post" @onsubmit="HandleSubmit">
+			<AntiforgeryToken />
 			<div class="mb-3">
-				<label for="name" class="form-label">Name:</label> 
-				<InputText id="name" @bind-Value="Student.Name" class="form-control" /> 
-				<ValidationMessage For="() => Student.Name" class="text-danger" /> 
-			</div>        
+				<label for="name" class="form-label">Name:</label>
+				<input type="text" id="name" class="form-control" @bind="Student.Name" />
+				@if (!string.IsNullOrEmpty(NameError))
+				{
+					<div class="text-danger">@NameError</div>
+				}
+			</div>
 			<div class="mb-3">
-				<label for="age" class="form-label">Age:</label> 
-				<InputNumber id="age" @bind-Value="Student.Age" class="form-control" /> 
-				<ValidationMessage For="() => Student.Age" class="text-danger" /> 
-			</div>        
+				<label for="age" class="form-label">Age:</label>
+				<input type="number" id="age" class="form-control" @bind="Student.Age" />
+				@if (!string.IsNullOrEmpty(AgeError))
+				{
+					<div class="text-danger">@AgeError</div>
+				}
+			</div>
 			<div class="mb-3">
-				<label for="birthday" class="form-label">Birthday:</label> 
-				<InputDate id="birthday" @bind-Value="Student.Birthday" class="form-control" /> 
-				<ValidationMessage For="() => Student.Birthday" class="text-danger" /> 
-			</div>        
+				<label for="birthday" class="form-label">Birthday:</label>
+				<input type="date" id="birthday" class="form-control" @bind="Student.Birthday" />
+				@if (!string.IsNullOrEmpty(BirthdayError))
+				{
+					<div class="text-danger">@BirthdayError</div>
+				}
+			</div>
 			<button type="submit" class="btn btn-primary">Create</button>
-		</EditForm>
+		</form>
 	</div>
 </div>
 
@@ -41,15 +49,48 @@
 </div>
 
 @code {
-	[SupplyParameterFromForm(FormName ="create")]
 	private Student Student { get; set; } = new();
+	private string NameError { get; set; }
+	private string AgeError { get; set; }
+	private string BirthdayError { get; set; }
 
-	// To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-	private async Task AddStudent()
+	private async Task HandleSubmit()
 	{
-		using var context = DbFactory.CreateDbContext();
-		context.Student.Add(Student);
-		await context.SaveChangesAsync();
-		NavigationManager.NavigateTo("/students");
+		if (ValidateForm())
+		{
+			bool success = StudentService.Insert(Student);
+			if (success)
+			{
+				NavigationManager.NavigateTo("/students");
+			}
+			else
+			{
+				// Handle the error accordingly
+			}
+		}
+	}
+
+	private bool ValidateForm()
+	{
+		bool isValid = true;
+		NameError = AgeError = BirthdayError = string.Empty;
+
+		if (string.IsNullOrEmpty(Student.Name))
+		{
+			NameError = "Name is required.";
+			isValid = false;
+		}
+		if (Student.Age <= 0)
+		{
+			AgeError = "Age must be a positive number.";
+			isValid = false;
+		}
+		if (Student.Birthday == default)
+		{
+			BirthdayError = "Birthday is required.";
+			isValid = false;
+		}
+
+		return isValid;
 	}
 }

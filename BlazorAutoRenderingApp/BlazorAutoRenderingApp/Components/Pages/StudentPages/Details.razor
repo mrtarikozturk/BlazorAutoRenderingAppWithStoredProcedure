@@ -1,8 +1,9 @@
 ﻿@page "/students/details"
 @using Microsoft.EntityFrameworkCore
 @using BlazorAutoRenderingApp.Models
-@inject IDbContextFactory<BlazorAutoRenderingApp.Data.BlazorAutoRenderingAppContext> DbFactory
+@inject BlazorAutoRenderingApp.DAL.Student_DAL studentDal
 @inject NavigationManager NavigationManager
+@attribute [StreamRendering]
 
 <PageTitle>Details</PageTitle>
 
@@ -32,15 +33,14 @@
 </div>
 
 @code {
-    private Student? student;
+	private Student? student;
 
-    [SupplyParameterFromQuery]
-    private int Id { get; set; }
+	[SupplyParameterFromQuery]
+	private int Id { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        using var context = DbFactory.CreateDbContext();
-        student = await context.Student.FirstOrDefaultAsync(m => m.Id == Id);
+	protected override  void OnInitialized()
+	{
+		student = studentDal.GetStudentById(Id);
 
         if (student is null)
         {

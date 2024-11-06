@@ -3,16 +3,19 @@ using BlazorAutoRenderingApp.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using BlazorAutoRenderingApp.Data;
+using BlazorAutoRenderingApp.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContextFactory<BlazorAutoRenderingAppContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BlazorAutoRenderingAppContext") ?? throw new InvalidOperationException("Connection string 'BlazorAutoRenderingAppContext' not found.")));
+//builder.Services.AddDbContextFactory<BlazorAutoRenderingAppContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("BlazorAutoRenderingAppContext") ?? throw new InvalidOperationException("Connection string 'BlazorAutoRenderingAppContext' not found.")));
 
-builder.Services.AddQuickGridEntityFrameworkAdapter();
+//builder.Services.AddQuickGridEntityFrameworkAdapter();
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+//builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Add services to the container.
+builder.Services.AddSingleton<Student_DAL>();
+
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents()
 	.AddInteractiveWebAssemblyComponents();

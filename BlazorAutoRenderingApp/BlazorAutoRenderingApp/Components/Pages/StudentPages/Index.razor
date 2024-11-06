@@ -1,38 +1,54 @@
 ﻿@page "/students"
-@using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using BlazorAutoRenderingApp.Models
-@using BlazorAutoRenderingApp.Data
-@implements IAsyncDisposable
-@inject IDbContextFactory<BlazorAutoRenderingApp.Data.BlazorAutoRenderingAppContext> DbFactory
+@using BlazorAutoRenderingApp.DAL
+@inject Student_DAL StudentService
 
 <PageTitle>Index</PageTitle>
 
 <h1>Index</h1>
 
 <p>
-    <a href="students/create">Create New</a>
+	<a href="students/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Student">
-    <PropertyColumn Property="student => student.Name" />
-    <PropertyColumn Property="student => student.Age" />
-    <PropertyColumn Property="student => student.Birthday" Title="Date of birth" Format="MM/dd/yyyy" />
-
-    <TemplateColumn Context="student">
-        <a href="@($"students/edit?id={student.Id}")">Edit</a> |
-        <a href="@($"students/details?id={student.Id}")">Details</a> |
-        <a href="@($"students/delete?id={student.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+@if (students == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Age</th>
+				<th>Date of Birth</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var student in students)
+			{
+				<tr>
+					<td>@student.Name</td>
+					<td>@student.Age</td>
+					<td>@student.Birthday.ToString("MM/dd/yyyy")</td>
+					<td>
+						<a href="@($"students/edit?id={student.Id}")">Edit</a> |
+						<a href="@($"students/details?id={student.Id}")">Details</a> |
+						<a href="@($"students/delete?id={student.Id}")">Delete</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
 
 @code {
-    private BlazorAutoRenderingAppContext context = default!;
+	private List<Student> students;
 
-    protected override void OnInitialized()
-    {
-        context = DbFactory.CreateDbContext();
-    }
-
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+	protected override async Task OnInitializedAsync()
+	{
+		students = await Task.Run(() => StudentService.GetStudents());
+	}
 }

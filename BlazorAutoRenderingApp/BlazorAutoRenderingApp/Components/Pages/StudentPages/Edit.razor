@@ -1,10 +1,11 @@
 ﻿@page "/students/edit"
-@using Microsoft.EntityFrameworkCore
 @using BlazorAutoRenderingApp.Models
-@inject IDbContextFactory<BlazorAutoRenderingApp.Data.BlazorAutoRenderingAppContext> DbFactory
 @inject NavigationManager NavigationManager
+@inject BlazorAutoRenderingApp.DAL.Student_DAL StudentDAL
+@rendermode InteractiveServer
+@attribute [StreamRendering]
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Edit Student</PageTitle>
 
 <h1>Edit</h1>
 
@@ -12,88 +13,72 @@
 <hr />
 @if (Student is null)
 {
-    <p><em>Loading...</em></p>
+	<p><em>Loading...</em></p>
 }
 else
 {
-    <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="Student" OnValidSubmit="UpdateStudent" FormName="edit" Enhance>
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <input type="hidden" name="Student.Id" value="@Student.Id" />
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name:</label>
-                    <InputText id="name" @bind-Value="Student.Name" class="form-control" />
-                    <ValidationMessage For="() => Student.Name" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="age" class="form-label">Age:</label>
-                    <InputNumber id="age" @bind-Value="Student.Age" class="form-control" />
-                    <ValidationMessage For="() => Student.Age" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="birthday" class="form-label">Birthday:</label>
-                    <InputDate id="birthday" @bind-Value="Student.Birthday" class="form-control" />
-                    <ValidationMessage For="() => Student.Birthday" class="text-danger" />
-                </div>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </EditForm>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-md-4">
+			<form method="post" @onsubmit="UpdateStudent" Enhance>
+				<AntiforgeryToken />
+				<input type="hidden" name="Student.Id" value="@Student.Id" Enhance/>
+				<div class="mb-3">
+					<label for="name" class="form-label">Name:</label>
+					<input id="name" name="name" @bind="Student.Name"  class="form-control" />
+					<span class="text-danger">@ValidationMessage(nameof(Student.Name))</span>
+				</div>
+				<div class="mb-3">
+					<label for="age" class="form-label">Age:</label>
+					<input id="age" name="age" type="number" @bind="Student.Age" class="form-control" />
+					<span class="text-danger">@ValidationMessage(nameof(Student.Age))</span>
+				</div>
+				<div class="mb-3">
+					<label for="birthday" class="form-label">Birthday:</label>
+					<input id="birthday" name="birthday" type="date" @bind="Student.Birthday" class="form-control" />
+					<span class="text-danger">@ValidationMessage(nameof(Student.Birthday))</span>
+				</div>
+				<button type="submit" class="btn btn-primary">Save</button>
+			</form>
+		</div>
+	</div>
 }
 
 <div>
-    <a href="/students">Back to List</a>
+	<a href="/students">Back to List</a>
 </div>
 
 @code {
-    [SupplyParameterFromQuery]
-    private int Id { get; set; }
+	[SupplyParameterFromQuery]
+	public int Id { get; set; }
 
-    [SupplyParameterFromForm]
-    private Student? Student { get; set; }
+	[SupplyParameterFromForm]
+	public Student? Student { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        using var context = DbFactory.CreateDbContext();
-        Student ??= await context.Student.FirstOrDefaultAsync(m => m.Id == Id);
+	protected override void OnInitialized()
+	{
+		Student = StudentDAL.GetStudentById(Id);
 
-        if (Student is null)
-        {
-            NavigationManager.NavigateTo("notfound");
-        }
-    }
+		if (Student is null)
+		{
+			NavigationManager.NavigateTo("notfound");
+		}
+	}
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-    private async Task UpdateStudent()
-    {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(Student!).State = EntityState.Modified;
+	private void UpdateStudent()
+	{
+		if (StudentDAL.Update(Student!))
+		{
+			NavigationManager.NavigateTo("/students");
+		}
+		else
+		{
+			NavigationManager.NavigateTo("/students");
+		}
+	}
 
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!StudentExists(Student!.Id))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        NavigationManager.NavigateTo("/students");
-    }
-
-    private bool StudentExists(int id)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.Student.Any(e => e.Id == id);
-    }
+	private string ValidationMessage(string propertyName)
+	{
+		// Implement validation message retrieval logic here
+		return string.Empty;
+	}
 }
